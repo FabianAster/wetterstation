@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: my_database
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./migrations:/flyway/sql
+    networks:
+      - shared_network
+
+  flyway:
+    image: flyway/flyway:9
+    container_name: flyway
+    depends_on:
+      - postgres
+    entrypoint: ["flyway", "migrate"]
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/my_database
+      FLYWAY_USER: myuser
+      FLYWAY_PASSWORD: mypassword
+    volumes:
+      - ./migrations:/flyway/sql
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    name: shared_network
