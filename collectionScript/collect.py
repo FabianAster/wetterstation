@@ -20,7 +20,7 @@ PG_CONN = {
 }
 
 
-def store_in_db(data):
+def store_in_db(data, topic):
     conn = psycopg2.connect(**PG_CONN)
     cur = conn.cursor()
     cur.execute(
@@ -30,7 +30,7 @@ def store_in_db(data):
         """,
         (
             data["temp"],
-            MQTT_TOPIC,
+            topic,
             data["pressure"],
             data["humidity"],
             data["currentVoltage"],
@@ -43,8 +43,8 @@ def store_in_db(data):
 
 def on_message(client, userdata, msg):
     payload = json.loads(msg.payload.decode())
-    print(f"Received: {payload}")
-    store_in_db(payload)
+    print(f"Received: {payload} on topic: {msg.topic}")
+    store_in_db(payload, msg.topic)
 
 
 client = mqtt.Client()
