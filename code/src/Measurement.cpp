@@ -3,18 +3,17 @@
 Measurement::Measurement(double currentVoltage)
     : currentVoltage(currentVoltage) {
 
-  while (1) {
-
-    if (!bme.begin()) {
-      Serial.println("Could not find a valid BME280 sensor, check wiring!");
-      Serial.println("\n");
-      delay(2000);
-    }
+  Serial.begin(74880);
+  Wire.begin();
+  while (!bme.begin()) {
+    Serial.println("Could not find BME280I2C sensor!");
+    delay(1000);
   }
 
-  bme_temp->printSensorDetails();
-  bme_pressure->printSensorDetails();
-  bme_humidity->printSensorDetails();
+  settings.tempOSR = BME280::OSR_X4;
+
+  Serial.println("found valid sensor");
+  bme.setSettings(this->settings);
 }
 
 Measurement::Measurement()
@@ -22,14 +21,16 @@ Measurement::Measurement()
 
 void Measurement::messure() {
   Serial.println("starting measurement");
-  sensors_event_t temp_event, pressure_event, humidity_event;
-  this->bme_temp->getEvent(&temp_event);
-  this->bme_pressure->getEvent(&pressure_event);
-  this->bme_humidity->getEvent(&humidity_event);
 
-  this->temperature = temp_event.temperature;
-  this->airPressure = temp_event.pressure;
-  this->humidity = temp_event.relative_humidity;
+  float temp(NAN), hum(NAN), pres(NAN);
+  BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+  BME280::PresUnit presUnit(BME280::PresUnit_Pa);
+
+  bme.read(pres, temp, hum, tempUnit, presUnit);
+
+  this->temperature = temp;
+  this->airPressure = pres;
+  this->humidity = hum;
 
   Serial.println("Printing the measurements:");
   this->printMeasurement();
