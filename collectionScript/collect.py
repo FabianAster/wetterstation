@@ -51,5 +51,5 @@ client = mqtt.Client()
 client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 client.on_message = on_message
 client.connect(MQTT_BROKER, MQTT_PORT)
-client.subscribe(MQTT_TOPIC)
+client.subscribe(MQTT_TOPIC + "/#")
 client.loop_forever()

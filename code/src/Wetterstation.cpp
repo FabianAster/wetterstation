@@ -19,7 +19,7 @@ void Wetterstation::run() {
   this->newMeasurement.messure();
 
   this->pub.init();
-  this->pub.publish("Wetterstation/measurements",
+  this->pub.publish("Wetterstation/measurements/zimmer",
                     this->newMeasurement.toJson().c_str());
   this->pub.run();
 
