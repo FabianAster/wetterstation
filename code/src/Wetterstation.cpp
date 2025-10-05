@@ -19,17 +19,17 @@ void Wetterstation::run() {
   this->newMeasurement.messure();
 
   this->pub.init();
-  this->pub.publish("Wetterstation/measurements/zimmer",
+  this->pub.publish("Wetterstation/measurements/wetterstation",
                     this->newMeasurement.toJson().c_str());
   this->pub.run();
 
   Serial.println("entering deep sleep");
-  ESP.deepSleep(5e6); // Deep sleep for 5 seconds
+  ESP.deepSleep(600e6); // Deep sleep for 5 seconds
 }
 
 double Wetterstation::readBatteryVoltage() {
   int analogValue = analogRead(A0);
-  double voltage = (analogValue / 1023.0) * 3.3;
+  double voltage = (analogValue / 1023.0) * 5;
   Serial.println(voltage);
   return voltage;
 }
