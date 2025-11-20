@@ -1,4 +1,10 @@
 ALTER TABLE weather_measurements
+    ALTER COLUMN voltage DROP NOT NULL,
+    ALTER COLUMN temperature DROP NOT NULL,
+    ALTER COLUMN airPressure DROP NOT NULL,
+    ALTER COLUMN humidity DROP NOT NULL;
+
+ALTER TABLE weather_measurements
     ADD COLUMN voc DECIMAL(20,10) NULL,
     ADD COLUMN airQuality DECIMAL(20,10) NULL,
     ADD COLUMN airQualityAccuracy DECIMAL(20,10) NULL,

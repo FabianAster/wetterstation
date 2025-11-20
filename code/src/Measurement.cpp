@@ -5,7 +5,8 @@ Measurement::Measurement() {
   Serial.println();
   Serial.println("Initializing BME680 + BSEC...");
 
-  temperature = airPressure = humidity = voc = airQuality = co2 = breathVoc = 0.0;
+  temperature = airPressure = humidity = voc = airQuality = co2 = breathVoc =
+      0.0;
   airQualityAccuracy = 0;
 }
 
@@ -46,9 +47,8 @@ void Measurement::setup() {
   };
 
   iaqSensor.updateSubscription(
-      sensorList,
-      sizeof(sensorList) / sizeof(sensorList[0]),
-      BSEC_SAMPLE_RATE_LP  // ~3s, good for room monitoring
+      sensorList, sizeof(sensorList) / sizeof(sensorList[0]),
+      BSEC_SAMPLE_RATE_LP // ~3s, good for room monitoring
   );
   checkIaqSensorStatus();
 
@@ -61,22 +61,22 @@ void Measurement::measure() {
   // only when a fresh data set is ready.
   if (iaqSensor.run()) {
     // Heater-compensated values
-    temperature = iaqSensor.temperature;          // °C
-    humidity    = iaqSensor.humidity;             // %RH
+    temperature = iaqSensor.temperature; // °C
+    humidity = iaqSensor.humidity;       // %RH
 
     // BSEC gives pressure in Pa; convert to hPa
-    airPressure = iaqSensor.pressure / 100.0;     // hPa
+    airPressure = iaqSensor.pressure / 100.0; // hPa
 
     // Raw gas resistance in Ohms
-    voc         = iaqSensor.gasResistance;
+    voc = iaqSensor.gasResistance;
 
     // IAQ index 0–500 (lower is better)
-    airQuality         = iaqSensor.iaq;
+    airQuality = iaqSensor.iaq;
     airQualityAccuracy = iaqSensor.iaqAccuracy;
 
     // Derived estimates
-    co2       = iaqSensor.co2Equivalent;          // ppm
-    breathVoc = iaqSensor.breathVocEquivalent;    // ppm
+    co2 = iaqSensor.co2Equivalent;             // ppm
+    breathVoc = iaqSensor.breathVocEquivalent; // ppm
 
     printMeasurement();
     this->newMeasurement = true;
