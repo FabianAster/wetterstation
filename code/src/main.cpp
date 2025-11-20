@@ -1,7 +1,11 @@
-#include "Wetterstation.hpp"
+#include "AirSensor.hpp"
+#include <Arduino.h>
 
-Wetterstation wetterstation;
+AirSensor AirSensor;
 
-void setup() {}
+void setup() { AirSensor.setup(); }
 
-void loop() { wetterstation.run(); }
+void loop() {
+  AirSensor.run();
+  delay(10);
+}

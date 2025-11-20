@@ -36,7 +36,8 @@ void Publisher::setup_wifi() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     tries++;
-    if (tries % 5 == 0) logInfo("Waiting for WiFi connection...");
+    if (tries % 5 == 0)
+      logInfo("Waiting for WiFi connection...");
   }
 
   logInfo("WiFi connected.");
@@ -73,9 +74,7 @@ void Publisher::init() {
   }
 }
 
-void Publisher::reconnect() {
-  logInfo("reconnect called");
-}
+void Publisher::reconnect() { logInfo("reconnect called"); }
 
 void Publisher::run() {
   if (!client.connected()) {

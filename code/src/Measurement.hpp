@@ -1,38 +1,46 @@
 #pragma once
 
+#include <Arduino.h>
 #include "publisher.hpp"
 #include "secrets.h"
 #include <SPI.h>
 #include <cstring>
 #include <string>
 
-#include <BME280I2C.h>
-#include <Wire.h> // Needed for legacy versions of Arduino.
+#include <Wire.h>
+#include "bsec.h"
+
 #define SERIAL_BAUD 74880
 
 class Measurement {
 public:
-  Measurement(double currentVoltage);
   Measurement();
-  void messure();
+
+  // Call once from setup()
+  void setup();
+
+  // Call regularly from loop()
+  void measure();
+
+  // Debug print
   void printMeasurement();
-  double currentVoltage;
-  double temperature;
-  double airPressure;
-  double humidity;
+
+  boolean newMeasurement = false;
+
+  // Last measured values
+  double temperature;          // °C (heater-compensated)
+  double airPressure;          // hPa
+  double humidity;             // %RH
+  double voc;                  // gas resistance (Ohm)
+  double airQuality;           // IAQ index (0–500, BSEC)
+  double co2;                  // CO₂ equivalent (ppm)
+  double breathVoc;            // bVOC equivalent (ppm)
+  uint8_t airQualityAccuracy;  // 0–3
+
   std::string toJson();
 
 private:
-  BME280I2C::Settings settings = {
-      BME280::OSR_X1,
-      BME280::OSR_X1,
-      BME280::OSR_X1,
-      BME280::Mode_Forced,
-      BME280::StandbyTime_1000ms,
-      BME280::Filter_Off,
-      BME280::SpiEnable_False,
-      BME280I2C::I2CAddr_0x76 // I2C address. I2C specific.
-  };
+  Bsec iaqSensor;
 
-  BME280I2C bme{settings};
+  void checkIaqSensorStatus();
 };
