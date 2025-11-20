@@ -6,6 +6,6 @@ CREATE TABLE weather_measurements (
     temperature DECIMAL(20,10) NOT NULL,
     airPressure DECIMAL(20,10) NOT NULL,
     humidity DECIMAL(20,10) NOT NULL,
-    voltage DECIMAL(20,10) NOT NULL
+    voltage DECIMAL(20,10) NULL
 );
 

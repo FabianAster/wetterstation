@@ -1,0 +1,6 @@
+ALTER TABLE weather_measurements
+    ADD COLUMN voc DECIMAL(20,10) NULL,
+    ADD COLUMN airQuality DECIMAL(20,10) NULL,
+    ADD COLUMN airQualityAccuracy DECIMAL(20,10) NULL,
+    ADD COLUMN co2 DECIMAL(20,10) NULL,
+    ADD COLUMN bVoc DECIMAL(20,10) NULL;

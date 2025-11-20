@@ -21,21 +21,34 @@ PG_CONN = {
 
 
 def store_in_db(data, topic):
+    column_map = [
+        ("temperature", "temp"),
+        ("airPressure", "pressure"),
+        ("humidity", "humidity"),
+        ("voc", "voc"),
+        ("airQuality", "airQuality"),
+        ("airQualityAccuracy", "airQualityAccuracy"),
+        ("co2", "co2"),
+        ("bVoc", "bVoc"),
+        ("voltage", "currentVoltage"),
+    ]
+    columns = []
+    values = []
+    for db_col, data_key in column_map:
+        if data_key in data:
+            columns.append(db_col)
+            values.append(data[data_key])
+    columns.append("topic")
+    values.append(topic)
+
+    if len(values) < 2:  # Only topic present, skip insert
+        return
+
     conn = psycopg2.connect(**PG_CONN)
     cur = conn.cursor()
-    cur.execute(
-        """
-        INSERT INTO weather_measurements (temperature, topic, airPressure, humidity, voltage)
-        VALUES (%s, %s, %s, %s, %s)
-        """,
-        (
-            data["temp"],
-            topic,
-            data["pressure"],
-            data["humidity"],
-            data["currentVoltage"],
-        ),
-    )
+    query = f"INSERT INTO weather_measurements ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(values))})"
+
+    cur.execute(query, values)
     conn.commit()
     cur.close()
     conn.close()
