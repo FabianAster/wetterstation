@@ -32,13 +32,13 @@ void AirSensor::run() {
       updatePulseAnimation(0.2);
     }
     if (this->newMeasurement.airQualityAccuracy == 1) {
-      this->setColor(this->currentColor);
+      updatePulseAnimation(0.3);
     }
     if (this->newMeasurement.airQualityAccuracy == 2) {
-      updatePulseAnimation(0.2);
+      updatePulseAnimation(0.1);
     }
     if (this->newMeasurement.airQualityAccuracy == 3) {
-      updatePulseAnimation(0.5);
+      this->setColor(this->currentColor);
     }
     WS2812B.show();
   }
@@ -76,15 +76,44 @@ void AirSensor::updateCurrentColor() {
   int iaq = constrain(this->newMeasurement.airQuality, 0, 500);
 
   float t;
-  uint8_t r, g, b = 0;
+  uint8_t r = 0, g = 0, b = 0;
 
-  if (iaq <= 300) {
-    t = iaq / 300.0f;
+  if (iaq <= 50) {
+    // Green (0,255,0) to Yellow (255,255,0)
+    t = iaq / 50.0f;
     r = (uint8_t)(t * 255);
-    g = (uint8_t)((1.0f - t) * 255);
-  } else {
+    g = 255;
+    b = 0;
+  } else if (iaq <= 100) {
+    // Yellow (255,255,0) to Orange (255,165,0)
+    t = (iaq - 50) / 50.0f;
     r = 255;
+    g = (uint8_t)(255 - t * (255 - 165));
+    b = 0;
+  } else if (iaq <= 250) {
+    // Orange (255,165,0) to Red (255,0,0)
+    t = (iaq - 100) / 50.0f;
+    r = 255;
+    g = (uint8_t)(165 - t * 165);
+    b = 0;
+  } else if (iaq <= 400) {
+    // Red (255,0,0) to Violet (128,0,128) -- extend reddish range to 300
+    t = (iaq - 150) / 150.0f;
+    r = (uint8_t)(255 - t * (255 - 128));
     g = 0;
+    b = (uint8_t)(t * 128);
+  } else if (iaq <= 500) {
+    // Violet (128,0,128) to Deep Red/Violet (128,0,255)
+    t = (iaq - 300) / 100.0f;
+    r = 128;
+    g = 0;
+    b = (uint8_t)(128 + t * (255 - 128));
+  } else {
+    // Deep Red/Violet (128,0,255) to Deep Red/Violet (255,0,255)
+    t = (iaq - 400) / 200.0f;
+    r = (uint8_t)(128 + t * (255 - 128));
+    g = 0;
+    b = 255;
   }
 
   this->currentColor = RgbColor{r, g, b};
