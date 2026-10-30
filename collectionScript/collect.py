@@ -114,14 +114,26 @@ def store_sen69c(data, topic):
 
 
 def ensure_sen69c_schema():
-    """Create the SEN69C table/index if they do not exist yet."""
-    conn = psycopg2.connect(**PG_CONN)
-    cur = conn.cursor()
-    cur.execute(SEN69C_SCHEMA.read_text())
-    conn.commit()
-    cur.close()
-    conn.close()
-    logging.info("SEN69C database schema is ready")
+    """Create the SEN69C table/index if they do not exist yet.
+
+    Postgres runs in Docker and may still be starting when systemd starts this
+    service, so retry instead of exiting and hitting the restart limit.
+    """
+    sql = SEN69C_SCHEMA.read_text()
+    while True:
+        conn = None
+        try:
+            conn = psycopg2.connect(**PG_CONN)
+            with conn, conn.cursor() as cur:
+                cur.execute(sql)
+            logging.info("SEN69C database schema is ready")
+            return
+        except psycopg2.OperationalError as exc:
+            logging.error("Database not ready: %s; retrying in 5s", exc)
+            time.sleep(5)
+        finally:
+            if conn is not None:
+                conn.close()
 
 
 def is_sen69c_topic(topic):
